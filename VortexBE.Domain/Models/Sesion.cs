@@ -13,10 +13,10 @@ namespace VortexBE.Domain.Models
     {
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         [Key]
-        [Column("SesionID")]
+        [Column("SesionId")]
         public Guid SesionId { set; get; }
 
-        [Column("UserID")]
+        [Column("UserId")]
         public int UserId { set; get; }
 
         [Column("Token")]
@@ -25,6 +25,7 @@ namespace VortexBE.Domain.Models
 
         [Column("Expiration_Date")]
         public DateTime Expiration_Date { set; get; }
+        
         //
         [ForeignKey("UserId")]
         public User User { set; get; }
