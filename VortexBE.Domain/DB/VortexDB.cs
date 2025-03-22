@@ -18,12 +18,12 @@ namespace VortexBE.Domain.DB
         }
 
         public DbSet<Cine> cines { get; set; }
-        public DbSet<Entrada> entradas { get; set; }
-        public DbSet<Funcion> funciones { get; set; }
-        public DbSet<Pago> pagos { get; set; }
-        public DbSet<Pelicula> peliculas { get; set; }
         public DbSet<Sala> salas { get; set; }
+        public DbSet<Pelicula> peliculas { get; set; }
+        public DbSet<Funcion> funciones { get; set; }
         public DbSet<User> usuarios { get; set; }
+        public DbSet<Entrada> entradas { get; set; }
+        public DbSet<Pago> pagos { get; set; }
         public DbSet<Sesion> sesiones { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

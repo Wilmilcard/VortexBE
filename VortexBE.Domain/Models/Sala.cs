@@ -10,7 +10,7 @@ using static System.Runtime.InteropServices.JavaScript.JSType;
 namespace VortexBE.Domain.Models
 {
     [Table("Sala")]
-    public class Sala
+    public class Sala : Auditory
     {
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         [Key]

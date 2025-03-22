@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 namespace VortexBE.Domain.Models
 {
     [Table("Cine")]
-    public class Cine
+    public class Cine : Auditory
     {
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         [Key]

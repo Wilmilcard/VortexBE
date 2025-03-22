@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 namespace VortexBE.Domain.Models
 {
     [Table("Entrada")]
-    public class Entrada
+    public class Entrada : Auditory
     {
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         [Key]

@@ -8,7 +8,8 @@ namespace VortexBE.Domain.Models
 {
     public class Auditory
     {
-        public DateTime creationAt { get; set; }
-        public DateTime updatedAt { get; set; }
+        public DateTime CreatedAt { get; set; }
+        public string CreatedBy { get; set; }
+        public DateTime? UpdatedAt { get; set; }
     }
 }
