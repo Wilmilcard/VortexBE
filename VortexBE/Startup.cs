@@ -2,6 +2,7 @@
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using VortexBE.Domain;
+using VortexBE.Utils;
 
 namespace VortexBE
 {
@@ -31,11 +32,11 @@ namespace VortexBE
 
             // Create DB variables and services
             builder.Services.AddCustomizedDataStore(config);
+            builder.Services.AddCustomizedServicesProject();
             builder.Services.AddCustomizedRepository();
-            //builder.Services.AddCustomizedServicesProject();
 
             //Global Exceptions
-            //builder.Services.AddTransient<GlobalExceptionHandler>();
+            builder.Services.AddTransient<GlobalExceptionHandler>();
 
             //Authenticathion API
             builder.Services.AddAuthentication(auth =>
@@ -75,7 +76,7 @@ namespace VortexBE
                 .AllowAnyMethod()
                 .AllowAnyHeader());
 
-            //app.UseMiddleware<GlobalExceptionHandler>();
+            app.UseMiddleware<GlobalExceptionHandler>();
 
             app.UseHttpsRedirection();
 
