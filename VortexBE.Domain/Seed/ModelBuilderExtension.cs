@@ -68,8 +68,9 @@ namespace VortexBE.Domain.Seed
                 .RuleFor(x => x.Genero, f => generos[random.Next(generos.Length)])
                 .RuleFor(x => x.Director, f => directores[random.Next(directores.Length)])
                 .RuleFor(x => x.Clasificacion, f => clasificaciones[random.Next(clasificaciones.Length)])
-                .RuleFor(x => x.PosterUrl, f => f.Internet.Avatar()) // URL de imagen ficticia
+                .RuleFor(x => x.PosterUrl, f => f.Internet.Avatar())
                 .RuleFor(x => x.FechaEstreno, f => f.Date.Between(fecha.AddYears(-5), fecha.AddMonths(6)))
+                .RuleFor(x => x.Activo, f => true)
                 .RuleFor(x => x.CreatedAt, f => fecha)
                 .RuleFor(x => x.CreatedBy, f => system);
 
@@ -104,8 +105,13 @@ namespace VortexBE.Domain.Seed
 
             var fakerUser = new Bogus.Faker<User>()
                 .RuleFor(x => x.UserId, f => id++)
-                .RuleFor(x => x.Username, f => f.Internet.UserName())
+                .RuleFor(x => x.Nombre, f => f.Name.FirstName())
+                .RuleFor(x => x.Apellido, f => f.Name.LastName())
+                .RuleFor(x => x.Username, (f, u) => f.Internet.UserName(u.Nombre, u.Apellido))
+                .RuleFor(x => x.Telefono,  f => f.Phone.PhoneNumber())
+                .RuleFor(x => x.Email,  f => f.Internet.Email())
                 .RuleFor(x => x.PasswordHash, f => Encrypt.MD5("4321"))
+                .RuleFor(x => x.Activo, f => random.Next(1,10) >= 3)
                 .RuleFor(x => x.CreatedAt, f => fecha)
                 .RuleFor(x => x.CreatedBy, f => system)
                 .RuleFor(x => x.UpdatedAt, f => random.Next(0, 2) == 1 ? fecha : (DateTime?)null);
@@ -118,7 +124,12 @@ namespace VortexBE.Domain.Seed
                 new User
                 {
                     UserId = 26,
-                    Username = "Juan",
+                    Username = "vortex",
+                    Nombre = "Juan David",
+                    Apellido = "Leon Barrera",
+                    Activo = true,
+                    Email = "leonjuandavid@hotmail.com",
+                    Telefono = "304 340 5607",
                     PasswordHash = Encrypt.MD5("1234"),
                     CreatedAt = fecha,
                     CreatedBy = system

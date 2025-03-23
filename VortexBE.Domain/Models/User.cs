@@ -16,12 +16,31 @@ namespace VortexBE.Domain.Models
         [Column("UserId")]
         public int UserId { get; set; }
 
+        [Column("Nombre")]
+        [StringLength(50)]
+        public string Nombre { get; set; }
+
+        [Column("Apellido")]
+        [StringLength(50)]
+        public string Apellido { get; set; }
+
         [Column("Username")]
         [StringLength(50)]
         public string Username { get; set; }
 
+        [Column("Email")]
+        [StringLength(150)]
+        public string Email { get; set; }
+
+        [Column("Telefono")]
+        [StringLength(30)]
+        public string Telefono { get; set; }
+
         [Column("PasswordHash")]
         [StringLength(600)]
         public string PasswordHash { get; set; }
+
+        public bool? Activo { get; set; }
+
     }
 }

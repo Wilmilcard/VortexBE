@@ -47,6 +47,8 @@ namespace VortexBE.Domain.Models
         [Required]
         public DateTime FechaEstreno { get; set; }
 
+        public bool Activo { get; set; }
+
         //virtual
         public virtual List<Funcion> Funciones { get; set; }
     }
