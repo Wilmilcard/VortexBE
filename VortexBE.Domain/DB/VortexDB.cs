@@ -37,5 +37,6 @@ namespace VortexBE.Domain.DB
                 .ConfigureWarnings(warnings => warnings
                     .Log(RelationalEventId.PendingModelChangesWarning));
         }
+
     }
 }

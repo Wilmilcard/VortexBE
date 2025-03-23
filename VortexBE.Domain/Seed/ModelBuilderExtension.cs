@@ -53,14 +53,16 @@ namespace VortexBE.Domain.Seed
 
             #region Peliculas
             id = 1;
+            int countp = 0;
 
+            var peliculas = new string[] { "Flow", "Superman", "Star Wars III", "Up", "Sin Limites" };
             var generos = new string[] { "Acción", "Comedia", "Drama", "Ciencia Ficción", "Terror", "Animación" };
             var clasificaciones = new string[] { "G", "PG", "PG-13", "R", "NC-17" };
             var directores = new string[] { "Steven Spielberg", "Christopher Nolan", "Quentin Tarantino", "Martin Scorsese", "Ridley Scott" };
 
             var fakerPeliculas = new Bogus.Faker<Pelicula>()
                 .RuleFor(x => x.PeliculaId, f => id++)
-                .RuleFor(x => x.Titulo, f => f.Lorem.Sentence(3))
+                .RuleFor(x => x.Titulo, f => peliculas[countp++])
                 .RuleFor(x => x.Descripcion, f => f.Lorem.Paragraph())
                 .RuleFor(x => x.Duracion, f => random.Next(80, 180)) // Duración entre 80 y 180 min
                 .RuleFor(x => x.Genero, f => generos[random.Next(generos.Length)])
@@ -71,9 +73,13 @@ namespace VortexBE.Domain.Seed
                 .RuleFor(x => x.CreatedAt, f => fecha)
                 .RuleFor(x => x.CreatedBy, f => system);
 
-            var listPeliculas = fakerPeliculas.Generate(15);
+            var listPeliculas = fakerPeliculas.Generate(5);
+            countp = 1;
             foreach (var p in listPeliculas)
+            {
+                p.PosterUrl = $"image-{countp++}";
                 modelBuilder.Entity<Pelicula>().HasData(p);
+            }
             #endregion
 
             #region Funcion
@@ -83,7 +89,7 @@ namespace VortexBE.Domain.Seed
                 .RuleFor(x => x.FuncionId, f => id++)
                 .RuleFor(x => x.FechaHora, f => f.Date.Between(fecha, fecha.AddMonths(1)))
                 .RuleFor(x => x.Precio, f => random.Next(10000, 50000))
-                .RuleFor(x => x.PeliculaId, f => random.Next(1, 15))
+                .RuleFor(x => x.PeliculaId, f => random.Next(1, listPeliculas.Count - 1))
                 .RuleFor(x => x.SalaId, f => random.Next(1, 100))
                 .RuleFor(x => x.CreatedAt, f => fecha)
                 .RuleFor(x => x.CreatedBy, f => system);
