@@ -1,4 +1,5 @@
-﻿using VortexBE.Services;
+﻿using VortexBE.Interfaces;
+using VortexBE.Services;
 
 namespace VortexBE
 {
@@ -7,9 +8,7 @@ namespace VortexBE
         public static IServiceCollection AddCustomizedServicesProject(this IServiceCollection services)
         {
             services.AddScoped<IUserServices, UserServices>();
-            //services.AddScoped<IProductServices, ProductServices>();
-            //services.AddScoped<IProductBusiness, ProductBusiness>();
-
+            services.AddScoped<IPeliculaServices, PeliculaServices>();
 
             return services;
         }

@@ -27,6 +27,8 @@ namespace VortexBE.Controllers
         [HttpPost("[Action]")]
         public async Task<IActionResult> Login([FromBody] LoginRequest request)
         {
+
+
             // Catch errors are caught by the GlobalExceptionHandler class
 
             if (string.IsNullOrEmpty(request.username) || string.IsNullOrEmpty(request.password))
@@ -56,12 +58,10 @@ namespace VortexBE.Controllers
                     UserId = user.UserId,
                     Token = token,
                     Expiration_Date = expiration_date,
-                    CreatedAt = Globals.SystemDate()
+                    CreatedAt = Globals.SystemDate(),
+                    CreatedBy = Globals.SystemUser()
                 };
                 _context.sesiones.Add(sesion);
-
-                user.UpdatedAt = Globals.SystemDate();
-                await _userServices.UpdateAsync(user);
 
                 _sesion = _context.sesiones.Where(x => x.UserId == user.UserId).FirstOrDefault();
             }
@@ -75,7 +75,7 @@ namespace VortexBE.Controllers
             }
 
             user.UpdatedAt = Globals.SystemDate();
-            await _userServices.UpdateAsync(user);
+            _context.usuarios.Update(user);
 
             _context.SaveChanges();
 
@@ -92,26 +92,6 @@ namespace VortexBE.Controllers
             return new OkObjectResult(response);
         }
 
-        [HttpPost("[Action]")]
-        public async Task<IActionResult> Create([FromBody] LoginRequest request)
-        {
-            var newUser = new User
-            {
-                Username = request.username,
-                PasswordHash = Encrypt.MD5(request.password),
-                CreatedAt = Utils.Globals.SystemDate(),
-                CreatedBy = Globals.SystemUser()
-            };
-
-            await _userServices.AddAsync(newUser);
-
-            var response = new
-            {
-                succcess = true,
-                data = "Proceso terminado"
-            };
-
-            return new OkObjectResult(response);
-        }
+        
     }
 }

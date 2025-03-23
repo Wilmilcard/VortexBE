@@ -25,7 +25,8 @@ namespace VortexBE
 
         public static void ConfigureServices(WebApplicationBuilder builder)
         {
-            var config = builder.Configuration;
+            ConfigurationManager config = builder.Configuration;
+            IWebHostEnvironment environment = builder.Environment;
 
             //Consumption of external services
             builder.Services.AddHttpClient();
@@ -34,6 +35,13 @@ namespace VortexBE
             builder.Services.AddCustomizedDataStore(config);
             builder.Services.AddCustomizedServicesProject();
             builder.Services.AddCustomizedRepository();
+
+            //Eliminar referencias circulares
+            builder.Services.AddControllers()
+                .AddNewtonsoftJson(options =>
+                options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
+                );
+
 
             //Global Exceptions
             builder.Services.AddTransient<GlobalExceptionHandler>();

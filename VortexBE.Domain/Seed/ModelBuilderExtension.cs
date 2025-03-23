@@ -78,7 +78,7 @@ namespace VortexBE.Domain.Seed
             countp = 1;
             foreach (var p in listPeliculas)
             {
-                p.PosterUrl = $"image-{countp++}";
+                p.PosterUrl = $"image-{countp++}.png";
                 modelBuilder.Entity<Pelicula>().HasData(p);
             }
             #endregion
@@ -90,12 +90,12 @@ namespace VortexBE.Domain.Seed
                 .RuleFor(x => x.FuncionId, f => id++)
                 .RuleFor(x => x.FechaHora, f => f.Date.Between(fecha, fecha.AddMonths(1)))
                 .RuleFor(x => x.Precio, f => random.Next(10000, 50000))
-                .RuleFor(x => x.PeliculaId, f => random.Next(1, listPeliculas.Count - 1))
+                .RuleFor(x => x.PeliculaId, f => random.Next(1, listPeliculas.Count))
                 .RuleFor(x => x.SalaId, f => random.Next(1, 100))
                 .RuleFor(x => x.CreatedAt, f => fecha)
                 .RuleFor(x => x.CreatedBy, f => system);
 
-            var listFunciones = fakerFunciones.Generate(100);
+            var listFunciones = fakerFunciones.Generate(150);
             foreach (var f in listFunciones)
                 modelBuilder.Entity<Funcion>().HasData(f);
             #endregion
