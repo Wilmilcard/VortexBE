@@ -27,8 +27,6 @@ namespace VortexBE.Controllers
         [HttpPost("[Action]")]
         public async Task<IActionResult> Login([FromBody] LoginRequest request)
         {
-
-
             // Catch errors are caught by the GlobalExceptionHandler class
 
             if (string.IsNullOrEmpty(request.username) || string.IsNullOrEmpty(request.password))

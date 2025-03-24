@@ -93,6 +93,53 @@ namespace VortexBE.Controllers
             
         }
 
+        [AllowAnonymous]
+        [HttpGet("[Action]/{cineId}")]
+        public async Task<IActionResult> GetByCine([FromRoute] int cineId)
+        {
+            try
+            {
+                var images_web = _configuration["CustomPaths:images_web"];
+                var images_local = Globals.PathSystem(["VortexBE.Domain", "Assets"]);
+
+                var query = _context.funciones
+                    .Include(x => x.Sala)
+                        .ThenInclude(c => c.Cine)
+                    .Include(x => x.Pelicula)
+                    .Where(x => x.Sala.CineId == cineId)
+                    .Select(x => new
+                    {
+                        x.FuncionId,
+                        x.Sala.Cine.Nombre,
+                        x.Sala.Cine.Direccion,
+                        x.Pelicula.Titulo,
+                        x.FechaHora,
+                        x.Precio
+                    })
+                    .ToList();
+
+                var response = new
+                {
+                    success = true,
+                    data = query,
+                };
+
+                return new OkObjectResult(response);
+            }
+            catch (Exception ex)
+            {
+                var response = new
+                {
+                    success = false,
+                    error = ex.Message,
+                    errorCode = ex.HResult
+                };
+                return new BadRequestObjectResult(response);
+
+            }
+
+        }
+
         [HttpPost("[Action]")]
         public async Task<IActionResult> Create([FromBody] PeliculaCreateUpdate request)
         {

@@ -9,6 +9,7 @@ namespace VortexBE
         {
             services.AddScoped<IUserServices, UserServices>();
             services.AddScoped<IPeliculaServices, PeliculaServices>();
+            services.AddScoped<IEntradaServices, EntradaServices>();
 
             return services;
         }
