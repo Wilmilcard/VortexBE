@@ -1,8 +1,8 @@
 ﻿namespace VortexBE.HttpRequest
 {
-    public class EnableRequest
+    public class ChangeStateRequest
     {
         public int Id { get; set; }
-        public bool Activo { get; set; }
+        public bool Estado { get; set; }
     }
 }

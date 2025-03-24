@@ -270,7 +270,7 @@ namespace VortexBE.Controllers
 
         [Authorize]
         [HttpPut("[Action]")]
-        public async Task<IActionResult> ChangeState([FromBody] EnableRequest request)
+        public async Task<IActionResult> ChangeState([FromBody] ChangeStateRequest request)
         {
             //No se usa Try Catch pues ya lo tengo de manera Global
             using (var transaccion = _context.Database.BeginTransaction())
@@ -283,7 +283,7 @@ namespace VortexBE.Controllers
 
                 var pelicula = this._peliculaServices.QueryNoTracking().Where(x => x.PeliculaId == request.Id).FirstOrDefault();
 
-                pelicula.Activo = request.Activo;
+                pelicula.Activo = request.Estado;
                 pelicula.UpdatedAt = Globals.SystemDate();
                 pelicula.CreatedBy = user.Username;
 
@@ -295,7 +295,7 @@ namespace VortexBE.Controllers
             var response = new
             {
                 success = true,
-                data = $"Pelicula se le cambio el estado a {request.Activo}"
+                data = $"Pelicula se le cambio el estado a {request.Estado}"
             };
 
             return new OkObjectResult(response);

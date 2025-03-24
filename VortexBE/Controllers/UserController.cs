@@ -119,7 +119,7 @@ namespace VortexBE.Controllers
         }
 
         [HttpPut("[Action]")]
-        public async Task<IActionResult> ChangeState([FromBody] EnableRequest request)
+        public async Task<IActionResult> ChangeState([FromBody] ChangeStateRequest request)
         {
             //No se usa Try Catch pues ya lo tengo de manera Global
             using (var transaccion = _context.Database.BeginTransaction())
@@ -129,7 +129,7 @@ namespace VortexBE.Controllers
 
                 var _user = _userServices.QueryNoTracking().Where(x => x.UserId == request.Id).FirstOrDefault();
                 
-                _user.Activo = request.Activo;
+                _user.Activo = request.Estado;
                 _user.UpdatedAt = Globals.SystemDate();
                 _user.CreatedBy = user.Username;
 
