@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using VortexBE.Domain;
 using VortexBE.Domain.DB;
@@ -10,6 +11,7 @@ using VortexBE.Utils;
 
 namespace VortexBE.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class UserController : ControllerBase
@@ -24,7 +26,6 @@ namespace VortexBE.Controllers
             _userServices = userServices;
             _configuration = configuration;
         }
-
 
         [HttpGet("[Action]")]
         public async Task<IActionResult> GetAll()
@@ -57,6 +58,9 @@ namespace VortexBE.Controllers
             //No se usa Try Catch pues ya lo tengo de manera Global
             using (var transaccion = _context.Database.BeginTransaction())
             {
+                var claims = User.Claims.FirstOrDefault();
+                var user = _context.usuarios.Where(x => x.Username == claims.Value).FirstOrDefault();
+
                 var exists_mail = _userServices.QueryNoTracking().Where(x => x.Email == request.Email).FirstOrDefault();
 
                 if(exists_mail != null)
@@ -70,8 +74,8 @@ namespace VortexBE.Controllers
                     Email = request.Email,
                     Telefono = request.Telefono,
                     PasswordHash = Encrypt.MD5(request.Password),
-                    CreatedAt = Utils.Globals.SystemDate(),
-                    CreatedBy = Globals.SystemUser()
+                    CreatedAt = Globals.SystemDate(),
+                    CreatedBy = user.Username
                 };
 
                 await _userServices.AddAsync(newUser);
@@ -94,8 +98,15 @@ namespace VortexBE.Controllers
             //No se usa Try Catch pues ya lo tengo de manera Global
             using (var transaccion = _context.Database.BeginTransaction())
             {
+                var claims = User.Claims.FirstOrDefault();
+                var user = _context.usuarios.Where(x => x.Username == claims.Value).FirstOrDefault();
+
                 var _user = _userServices.QueryNoTracking().Where(x => x.UserId == id).FirstOrDefault();
+                
                 _user.Activo = request.Activo;
+                _user.UpdatedAt = Globals.SystemDate();
+                _user.CreatedBy = user.Username;
+
                 await _userServices.UpdateAsync(_user);
 
                 transaccion.Commit();

@@ -6,6 +6,7 @@ using VortexBE.Utils;
 using VortexBE.HttpRequest;
 using VortexBE.Domain.DB;
 using VortexBE.Services;
+using Microsoft.AspNetCore.Authorization;
 
 namespace VortexBE.Controllers
 {
@@ -24,6 +25,7 @@ namespace VortexBE.Controllers
             _configuration = configuration;
         }
 
+        [AllowAnonymous]
         [HttpPost("[Action]")]
         public async Task<IActionResult> Login([FromBody] LoginRequest request)
         {
@@ -89,7 +91,5 @@ namespace VortexBE.Controllers
 
             return new OkObjectResult(response);
         }
-
-        
     }
 }

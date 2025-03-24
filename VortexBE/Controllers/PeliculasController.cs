@@ -146,6 +146,9 @@ namespace VortexBE.Controllers
             //No se usa Try Catch pues ya lo tengo de manera Global
             using (var transaccion = _context.Database.BeginTransaction())
             {
+                var claims = User.Claims.FirstOrDefault();
+                var user = _context.usuarios.Where(x => x.Username == claims.Value).FirstOrDefault();
+
                 if (request == null)
                     return BadRequest(new { success = false, error = 400, content = "La informacion que envio esta vacia" });
 
@@ -161,7 +164,7 @@ namespace VortexBE.Controllers
                     FechaEstreno = request.FechaEstreno,
                     Activo = true,
                     CreatedAt = Globals.SystemDate(),
-                    CreatedBy = Globals.SystemUser()
+                    CreatedBy = user.Username
                 };
 
                 await _peliculaServices.AddAsync(p);
@@ -185,6 +188,9 @@ namespace VortexBE.Controllers
             //No se usa Try Catch pues ya lo tengo de manera Global
             using (var transaccion = _context.Database.BeginTransaction())
             {
+                var claims = User.Claims.FirstOrDefault();
+                var user = _context.usuarios.Where(x => x.Username == claims.Value).FirstOrDefault();
+
                 if (request == null)
                     return BadRequest(new { success = false, error = 400, content = "La informacion que envio esta vacia" });
 
@@ -199,7 +205,7 @@ namespace VortexBE.Controllers
                 pelicula.PosterUrl = request.PosterUrl;
                 pelicula.FechaEstreno = request.FechaEstreno;
                 pelicula.UpdatedAt = Globals.SystemDate();
-                pelicula.CreatedBy = Globals.SystemUser();
+                pelicula.CreatedBy = user.Username;
 
                 await _peliculaServices.UpdateAsync(pelicula);
                 _context.SaveChanges();
@@ -222,12 +228,17 @@ namespace VortexBE.Controllers
             //No se usa Try Catch pues ya lo tengo de manera Global
             using (var transaccion = _context.Database.BeginTransaction())
             {
+                var claims = User.Claims.FirstOrDefault();
+                var user = _context.usuarios.Where(x => x.Username == claims.Value).FirstOrDefault();
+
                 if (request == null)
                     return BadRequest(new { success = false, error = 400, content = "La informacion que envio esta vacia" });
 
                 var pelicula = this._peliculaServices.QueryNoTracking().Where(x => x.PeliculaId == request.PeliculaId).FirstOrDefault();
 
                 pelicula.Activo = request.Activo;
+                pelicula.UpdatedAt = Globals.SystemDate();
+                pelicula.CreatedBy = user.Username;
 
                 await _peliculaServices.UpdateAsync(pelicula);
                 _context.SaveChanges();

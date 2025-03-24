@@ -11,6 +11,7 @@ using VortexBE.Utils;
 
 namespace VortexBE.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class PagosController : ControllerBase
@@ -26,7 +27,6 @@ namespace VortexBE.Controllers
             _configuration = configuration;
         }
 
-        [AllowAnonymous]
         [HttpGet("[Action]/{userId}")]
         public async Task<IActionResult> GetAll([FromRoute] int userId)
         {
@@ -71,7 +71,6 @@ namespace VortexBE.Controllers
             return new OkObjectResult(response);
         }
 
-        [Authorize]
         [HttpPost("[Action]")]
         public async Task<IActionResult> Pay([FromBody] PagoRequest request)
         {
@@ -125,8 +124,6 @@ namespace VortexBE.Controllers
 
                 transaccion.Commit();
             }
-
-            
 
             var response = new
             {
