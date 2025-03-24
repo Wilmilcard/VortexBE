@@ -86,10 +86,11 @@ namespace VortexBE.Domain.Seed
             #region Funcion
             id = 1;
 
+            var precios = new int[] { 6000, 10000, 12000, 15000, 24000 };
             var fakerFunciones = new Bogus.Faker<Funcion>()
                 .RuleFor(x => x.FuncionId, f => id++)
                 .RuleFor(x => x.FechaHora, f => f.Date.Between(fecha, fecha.AddMonths(1)))
-                .RuleFor(x => x.Precio, f => random.Next(10000, 50000))
+                .RuleFor(x => x.Precio, f => precios[random.Next(clasificaciones.Length)])
                 .RuleFor(x => x.PeliculaId, f => random.Next(1, listPeliculas.Count))
                 .RuleFor(x => x.SalaId, f => random.Next(1, 100))
                 .RuleFor(x => x.CreatedAt, f => fecha)
@@ -147,7 +148,7 @@ namespace VortexBE.Domain.Seed
             var fakerEntrada = new Bogus.Faker<Entrada>()
                 .RuleFor(x => x.EntradaId, f => id++)
                 .RuleFor(x => x.Cantidad, f => f.Random.Int(1, 5))
-                .RuleFor(x => x.Total, (f, e) => e.Cantidad * f.Random.Decimal(10, 50))
+                .RuleFor(x => x.Total, (f, e) => e.Cantidad * precios[random.Next(clasificaciones.Length)])
                 .RuleFor(x => x.FechaCompra, f => f.Date.Past(1))
                 .RuleFor(x => x.UserId, f => f.PickRandom(userIds))
                 .RuleFor(x => x.FuncionId, f => f.PickRandom(funcionIds))

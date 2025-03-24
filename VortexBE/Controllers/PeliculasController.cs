@@ -31,7 +31,7 @@ namespace VortexBE.Controllers
             _configuration = configuration;
         }
 
-        [Authorize]
+        [AllowAnonymous]
         [HttpGet("[Action]")]
         public async Task<IActionResult> GetAll()
         {
@@ -94,8 +94,8 @@ namespace VortexBE.Controllers
         }
 
         [AllowAnonymous]
-        [HttpGet("[Action]/{cineId}")]
-        public async Task<IActionResult> GetByCine([FromRoute] int cineId)
+        [HttpPost("[Action]")]
+        public async Task<IActionResult> GetByFilters([FromBody] FilterMoviesRequest request)
         {
             try
             {
@@ -106,22 +106,44 @@ namespace VortexBE.Controllers
                     .Include(x => x.Sala)
                         .ThenInclude(c => c.Cine)
                     .Include(x => x.Pelicula)
-                    .Where(x => x.Sala.CineId == cineId)
-                    .Select(x => new
-                    {
-                        x.FuncionId,
-                        x.Sala.Cine.Nombre,
-                        x.Sala.Cine.Direccion,
-                        x.Pelicula.Titulo,
-                        x.FechaHora,
-                        x.Precio
-                    })
                     .ToList();
+
+                if (request.CineId != null || request.CineId > 0)
+                    query = query.Where(x => x.Sala.CineId == request.CineId).ToList();
+                if (request.DireccionCine != null)
+                    query = query.Where(x => x.Sala.Cine.Direccion.Contains(request.DireccionCine)).ToList();
+                if (request.Titulo != null)
+                    query = query.Where(x => x.Pelicula.Titulo.Contains(request.Titulo)).ToList();
+                if (request.Descripcion != null)
+                    query = query.Where(x => x.Pelicula.Descripcion.Contains(request.Descripcion)).ToList();
+                if (request.Genero != null)
+                    query = query.Where(x => x.Pelicula.Genero.Contains(request.Genero)).ToList();
+                if (request.Director != null)
+                    query = query.Where(x => x.Pelicula.Director.Contains(request.Director)).ToList();
+                
+                
+                if (request.FechaFuncionInicio > request.FechaFuncionFin)
+                    return BadRequest(new { success = false, error = 400, content = "La fecha fin es anterior a la fecha inicio" });
+                if (request.FechaFuncionInicio == null && request.FechaFuncionFin != null)
+                    return BadRequest(new { success = false, error = 400, content = "La fecha inicio esta null" });
+                if (request.FechaFuncionInicio != null && request.FechaFuncionFin == null)
+                    return BadRequest(new { success = false, error = 400, content = "La fecha fin esta null" });
+                if (request.FechaFuncionInicio != null && request.FechaFuncionFin != null)
+                    query = query.Where(x => x.FechaHora >= request.FechaFuncionInicio && x.FechaHora <= request.FechaFuncionFin).ToList();
+
 
                 var response = new
                 {
                     success = true,
-                    data = query,
+                    data = query
+                        .Select(x => new
+                        {
+                            x.Pelicula.Titulo,
+                            x.Sala.Cine.Nombre,
+                            x.Sala.Cine.Direccion,
+                            x.FechaHora,
+                            x.Precio
+                        }).ToList()
                 };
 
                 return new OkObjectResult(response);
@@ -140,6 +162,7 @@ namespace VortexBE.Controllers
 
         }
 
+        [Authorize]
         [HttpPost("[Action]")]
         public async Task<IActionResult> Create([FromBody] PeliculaCreateUpdate request)
         {
@@ -168,6 +191,17 @@ namespace VortexBE.Controllers
                 };
 
                 await _peliculaServices.AddAsync(p);
+
+                var funciones = _context.funciones.Where(x => request.FuncionesId.Contains(x.FuncionId)).ToList();
+                foreach(var f in funciones)
+                {
+                    f.PeliculaId = p.PeliculaId;
+                    f.UpdatedAt = Globals.SystemDate();
+                    f.CreatedBy = user.Username;
+
+                    _context.funciones.Update(f);
+                }
+
                 _context.SaveChanges();
                 transaccion.Commit();
             }
@@ -175,14 +209,15 @@ namespace VortexBE.Controllers
             var response = new
             {
                 success = true,
-                data = request
+                data = $"Pelicula {request.Titulo} creada"
             };
 
             return new OkObjectResult(response);
 
         }
 
-        [HttpPost("[Action]")]
+        [Authorize]
+        [HttpPut("[Action]")]
         public async Task<IActionResult> Update([FromBody] PeliculaCreateUpdate request)
         {
             //No se usa Try Catch pues ya lo tengo de manera Global
@@ -208,6 +243,17 @@ namespace VortexBE.Controllers
                 pelicula.CreatedBy = user.Username;
 
                 await _peliculaServices.UpdateAsync(pelicula);
+
+                var funciones = _context.funciones.Where(x => request.FuncionesId.Contains(x.FuncionId)).ToList();
+                foreach (var f in funciones)
+                {
+                    f.PeliculaId = pelicula.PeliculaId;
+                    f.UpdatedAt = Globals.SystemDate();
+                    f.CreatedBy = user.Username;
+
+                    _context.funciones.Update(f);
+                }
+
                 _context.SaveChanges();
                 transaccion.Commit();
             }
@@ -215,15 +261,16 @@ namespace VortexBE.Controllers
             var response = new
             {
                 success = true,
-                data = request
+                data = $"Pelicula {request.Titulo} actualizada"
             };
 
             return new OkObjectResult(response);
 
         }
 
-        [HttpPost("[Action]")]
-        public async Task<IActionResult> Enable([FromBody] PeliculaCreateUpdate request)
+        [Authorize]
+        [HttpPut("[Action]")]
+        public async Task<IActionResult> ChangeState([FromBody] EnableRequest request)
         {
             //No se usa Try Catch pues ya lo tengo de manera Global
             using (var transaccion = _context.Database.BeginTransaction())
@@ -234,7 +281,7 @@ namespace VortexBE.Controllers
                 if (request == null)
                     return BadRequest(new { success = false, error = 400, content = "La informacion que envio esta vacia" });
 
-                var pelicula = this._peliculaServices.QueryNoTracking().Where(x => x.PeliculaId == request.PeliculaId).FirstOrDefault();
+                var pelicula = this._peliculaServices.QueryNoTracking().Where(x => x.PeliculaId == request.Id).FirstOrDefault();
 
                 pelicula.Activo = request.Activo;
                 pelicula.UpdatedAt = Globals.SystemDate();
@@ -248,7 +295,7 @@ namespace VortexBE.Controllers
             var response = new
             {
                 success = true,
-                data = request
+                data = $"Pelicula se le cambio el estado a {request.Activo}"
             };
 
             return new OkObjectResult(response);

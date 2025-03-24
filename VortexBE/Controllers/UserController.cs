@@ -52,6 +52,32 @@ namespace VortexBE.Controllers
             return new OkObjectResult(response);
         }
 
+        [HttpGet("[Action]/{userId}")]
+        public async Task<IActionResult> GetById([FromRoute] int userId)
+        {
+            var query = _userServices
+                .QueryNoTracking()
+                .Select(x => new
+                {
+                    x.UserId,
+                    x.Nombre,
+                    x.Apellido,
+                    x.Email,
+                    x.Telefono,
+                    x.Activo
+                })
+                .Where(x => x.UserId == userId)
+                .FirstOrDefault();
+
+            var response = new
+            {
+                succcess = true,
+                data = query
+            };
+
+            return new OkObjectResult(response);
+        }
+
         [HttpPost("[Action]")]
         public async Task<IActionResult> Create([FromBody] UserCreateUpdate request)
         {
@@ -92,8 +118,8 @@ namespace VortexBE.Controllers
             return new OkObjectResult(response);
         }
 
-        [HttpPut("[Action]/{id}")]
-        public async Task<IActionResult> ChangeState([FromBody] UserCreateUpdate request, [FromRoute] int id)
+        [HttpPut("[Action]")]
+        public async Task<IActionResult> ChangeState([FromBody] EnableRequest request)
         {
             //No se usa Try Catch pues ya lo tengo de manera Global
             using (var transaccion = _context.Database.BeginTransaction())
@@ -101,7 +127,7 @@ namespace VortexBE.Controllers
                 var claims = User.Claims.FirstOrDefault();
                 var user = _context.usuarios.Where(x => x.Username == claims.Value).FirstOrDefault();
 
-                var _user = _userServices.QueryNoTracking().Where(x => x.UserId == id).FirstOrDefault();
+                var _user = _userServices.QueryNoTracking().Where(x => x.UserId == request.Id).FirstOrDefault();
                 
                 _user.Activo = request.Activo;
                 _user.UpdatedAt = Globals.SystemDate();

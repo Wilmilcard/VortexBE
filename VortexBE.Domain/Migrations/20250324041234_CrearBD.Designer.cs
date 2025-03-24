@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using VortexBE.Domain.DB;
 
@@ -11,9 +12,11 @@ using VortexBE.Domain.DB;
 namespace VortexBE.Domain.Migrations
 {
     [DbContext(typeof(VortexDB))]
-    partial class VortexDBModelSnapshot : ModelSnapshot
+    [Migration("20250324041234_CrearBD")]
+    partial class CrearBD
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

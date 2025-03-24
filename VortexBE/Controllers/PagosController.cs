@@ -28,7 +28,7 @@ namespace VortexBE.Controllers
         }
 
         [HttpGet("[Action]/{userId}")]
-        public async Task<IActionResult> GetAll([FromRoute] int userId)
+        public async Task<IActionResult> GetByUserId([FromRoute] int userId)
         {
             var query = _entradaServices
                 .QueryNoTracking()
@@ -40,32 +40,35 @@ namespace VortexBE.Controllers
                 .Include(x => x.Funcion)
                     .ThenInclude(s => s.Pelicula)
                 .Where(x => x.UserId == userId)
-                .Select(x => new
-                {
-                    Nombre = $"{x.Usuario.Nombre} {x.Usuario.Apellido}",
-                    x.Usuario.Email,
-                    x.Usuario.Username,
-                    x.Usuario.Telefono,
-                    Cine = x.Funcion.Sala.Cine.Nombre,
-                    x.Funcion.Sala.Cine.Direccion,
-                    x.Funcion.Sala.Cine.Ciudad,
-                    x.Funcion.Pelicula.Titulo,
-                    x.Funcion.Pelicula.Clasificacion,
-                    x.FechaCompra,
-                    x.Cantidad,
-                    x.Total,
-                    x.Pago.PagoId,
-                    x.Pago.FechaPago,
-                    x.Pago.MetodoPago,
-                    x.Pago.Estado
-                })
-                .OrderByDescending(x => x.FechaPago)
+                .OrderByDescending(x => x.Pago.FechaPago)
                 .ToList();
+
+            var data_response = new
+            {
+                Nombre = $"{query[0].Usuario.Nombre} {query[0].Usuario.Apellido}",
+                query[0].Usuario.Email,
+                query[0].Usuario.Username,
+                query[0].Usuario.Telefono,
+                compras = query.Select(x => new
+                        {
+                            x.Funcion.Pelicula.Titulo,
+                            Cine = x.Funcion.Sala.Cine.Nombre,
+                            x.Funcion.Sala.Cine.Ciudad,
+                            x.Funcion.Sala.Cine.Direccion,
+                            x.FechaCompra,
+                            x.Cantidad,
+                            x.Pago.PagoId,
+                            x.Pago.FechaPago,
+                            x.Pago.MetodoPago,
+                            x.Total,
+                            x.Pago.Estado
+                        }).ToList()
+            };
 
             var response = new
             {
                 succcess = true,
-                data = query
+                data = data_response
             };
 
             return new OkObjectResult(response);
@@ -88,7 +91,7 @@ namespace VortexBE.Controllers
                     Cantidad = request.Cantidad,
                     FechaCompra = Globals.SystemDate(),
                     FuncionId = request.FuncionId,
-                    Total = request.Total,
+                    Total = request.Cantidad * request.Total,
                     CreatedAt = Globals.SystemDate(),
                     CreatedBy = user.Username
                 };
