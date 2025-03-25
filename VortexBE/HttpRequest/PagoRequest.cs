@@ -9,7 +9,7 @@ namespace VortexBE.HttpRequest
         //Info de Entrada
         public int Cantidad { get; set; }
         public decimal Total { get; set; }
-        public int FuncionId { get; set; }
+        public int PeliculaId { get; set; }
         //Info para pago
         public string MetodoPago { get; set; }
     }

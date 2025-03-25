@@ -85,12 +85,14 @@ namespace VortexBE.Controllers
                 if(user == null)
                     return BadRequest(new { success = false, error = 400, content = "No se encuentra registrado" });
 
+                var _funcion = _context.funciones.Where(x => x.PeliculaId == request.PeliculaId).FirstOrDefault();
+
                 var nuevaEntrada = new Entrada
                 {
                     UserId = user.UserId,
                     Cantidad = request.Cantidad,
                     FechaCompra = Globals.SystemDate(),
-                    FuncionId = request.FuncionId,
+                    FuncionId = _funcion.FuncionId,
                     Total = request.Cantidad * request.Total,
                     CreatedAt = Globals.SystemDate(),
                     CreatedBy = user.Username

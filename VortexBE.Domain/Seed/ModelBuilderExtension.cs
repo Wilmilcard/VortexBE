@@ -59,6 +59,7 @@ namespace VortexBE.Domain.Seed
             var generos = new string[] { "Acción", "Comedia", "Drama", "Ciencia Ficción", "Terror", "Animación" };
             var clasificaciones = new string[] { "G", "PG", "PG-13", "R", "NC-17" };
             var directores = new string[] { "Steven Spielberg", "Christopher Nolan", "Quentin Tarantino", "Martin Scorsese", "Ridley Scott" };
+            var posterWeb = new string[] { "https://i.imgur.com/FIF369K.png", "https://i.imgur.com/bjOqV8Q.jpeg", "https://i.imgur.com/k6ZEeAp.jpeg", "https://i.imgur.com/vZipW7h.jpeg", "https://i.imgur.com/b9MSW07.jpeg" };
 
             var fakerPeliculas = new Bogus.Faker<Pelicula>()
                 .RuleFor(x => x.PeliculaId, f => id++)
@@ -68,17 +69,17 @@ namespace VortexBE.Domain.Seed
                 .RuleFor(x => x.Genero, f => generos[random.Next(generos.Length)])
                 .RuleFor(x => x.Director, f => directores[random.Next(directores.Length)])
                 .RuleFor(x => x.Clasificacion, f => clasificaciones[random.Next(clasificaciones.Length)])
-                .RuleFor(x => x.PosterUrl, f => f.Internet.Avatar())
+                .RuleFor(x => x.PosterUrl, f => "URL")
                 .RuleFor(x => x.FechaEstreno, f => f.Date.Between(fecha.AddYears(-5), fecha.AddMonths(6)))
                 .RuleFor(x => x.Activo, f => true)
                 .RuleFor(x => x.CreatedAt, f => fecha)
                 .RuleFor(x => x.CreatedBy, f => system);
 
             var listPeliculas = fakerPeliculas.Generate(5);
-            countp = 1;
+            countp = 0;
             foreach (var p in listPeliculas)
             {
-                p.PosterUrl = $"image-{countp++}.png";
+                p.PosterUrl = posterWeb[countp++];
                 modelBuilder.Entity<Pelicula>().HasData(p);
             }
             #endregion

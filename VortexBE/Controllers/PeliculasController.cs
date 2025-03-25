@@ -54,8 +54,8 @@ namespace VortexBE.Controllers
                         x.Genero,
                         x.Director,
                         x.Clasificacion,
-                        poster_web = $"{images_web}",
-                        poster_local = $"{images_local}\\{x.PosterUrl}",
+                        poster_error = $"{images_web}",
+                        poster = x.PosterUrl,
                         x.FechaEstreno,
                         x.Activo,
                         Funciones = x.Funciones
@@ -106,22 +106,17 @@ namespace VortexBE.Controllers
                     .Include(x => x.Sala)
                         .ThenInclude(c => c.Cine)
                     .Include(x => x.Pelicula)
+                    .Where(x => x.Pelicula.Activo)
                     .ToList();
 
-                if (request.CineId != null || request.CineId > 0)
+                if (request.CineId != null && request.CineId > 0)
                     query = query.Where(x => x.Sala.CineId == request.CineId).ToList();
-                if (request.DireccionCine != null)
-                    query = query.Where(x => x.Sala.Cine.Direccion.Contains(request.DireccionCine)).ToList();
                 if (request.Titulo != null)
-                    query = query.Where(x => x.Pelicula.Titulo.Contains(request.Titulo)).ToList();
-                if (request.Descripcion != null)
-                    query = query.Where(x => x.Pelicula.Descripcion.Contains(request.Descripcion)).ToList();
-                if (request.Genero != null)
-                    query = query.Where(x => x.Pelicula.Genero.Contains(request.Genero)).ToList();
-                if (request.Director != null)
-                    query = query.Where(x => x.Pelicula.Director.Contains(request.Director)).ToList();
-                
-                
+                    query = query.Where(x => x.Pelicula.Titulo.ToLower().Contains(request.Titulo.ToLower())).ToList();
+                if (request.PeliculaId != null && request.PeliculaId > 0)
+                    query = query.Where(x => x.PeliculaId == request.PeliculaId).ToList();
+
+
                 if (request.FechaFuncionInicio > request.FechaFuncionFin)
                     return BadRequest(new { success = false, error = 400, content = "La fecha fin es anterior a la fecha inicio" });
                 if (request.FechaFuncionInicio == null && request.FechaFuncionFin != null)
@@ -138,12 +133,20 @@ namespace VortexBE.Controllers
                     data = query
                         .Select(x => new
                         {
+                            x.PeliculaId,
                             x.Pelicula.Titulo,
-                            x.Sala.Cine.Nombre,
-                            x.Sala.Cine.Direccion,
+                            x.Pelicula.Descripcion,
+                            x.Pelicula.Duracion,
+                            x.Pelicula.Genero,
+                            x.Pelicula.Director,
+                            x.Pelicula.Clasificacion,
                             x.FechaHora,
-                            x.Precio
-                        }).ToList()
+                            x.Precio,
+                            x.FuncionId,
+                            poster_error = $"{images_web}",
+                            poster = x.Pelicula.PosterUrl,
+                            x.Pelicula.FechaEstreno
+                        }).FirstOrDefault()
                 };
 
                 return new OkObjectResult(response);
